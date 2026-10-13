@@ -1,8 +1,8 @@
-import sys
+import sys, json, os
 from rich import print
 
 
-surikata = {
+default_surikata = {
     "jméno": "Evžen",
     "čistota": 80,
     "hlad": 50,
@@ -72,7 +72,27 @@ def vypis_status():
         má radost: {surikata["radost"]}
     """)  
 
+
+def save_game():
+    with open("data.json", "w", encoding="utf-8") as f:
+        json.dump(surikata, f, ensure_ascii=False, indent=4)
+
+
+def load_game():
+    global surikata
+
+    if os.path.exists("data.json"):
+        with open("data.json", "r", encoding="utf-8") as f:
+            surikata = json.load(f)
+    else:
+        surikata = default_surikata
+        save_game()
+
+
+
 def main():
+    load_game()
+
     print("[green bold]Vítej![/green bold]")
     print(f"Zdraví tě {surikata['jméno']}")
     print("""[yellow bold]
@@ -110,14 +130,17 @@ def main():
                 hra()
             case "v":
                 vypis_status()
+            case "save":
+                save_game()
             case "l":
                 lek()
             case _:
                 print("[bold red]Neplatná klávesa[/bold red]")
 
 
-
+        
         zkontroluj_status()
+        save_game()
 
 
 
