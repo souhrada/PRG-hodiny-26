@@ -1,0 +1,11 @@
+{
+    "jméno": "Evžen",
+    "čistota": 80,
+    "hlad": 50,
+    "žízeň": 10,
+    "životy": 100,
+    "energie": 100,
+    "žije": true,
+    "nemoc": false,
+    "radost": true
+}

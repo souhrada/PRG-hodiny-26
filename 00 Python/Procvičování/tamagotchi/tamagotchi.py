@@ -82,8 +82,17 @@ def load_game():
     global surikata
 
     if os.path.exists("data.json"):
-        with open("data.json", "r", encoding="utf-8") as f:
-            surikata = json.load(f)
+        try: 
+            with open("data.json", "r", encoding="utf-8") as f:
+                surikata = json.load(f)
+        except json.JSONDecodeError:
+            surikata = default_surikata
+            save_game()
+
+        if not isinstance(surikata, dict) or len(surikata) < 9:
+            surikata = default_surikata
+            save_game()
+                
     else:
         surikata = default_surikata
         save_game()
@@ -145,3 +154,5 @@ def main():
 
 
 main()
+
+
