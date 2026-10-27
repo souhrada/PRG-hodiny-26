@@ -1,5 +1,6 @@
-import sys, json, os
+import sys, json, os, random
 from rich import print
+import datetime as dt
 
 
 default_surikata = {
@@ -12,64 +13,73 @@ default_surikata = {
     "žije": True,
     "nemoc": False,
     "radost": True,
+    "věk": 1,
 }
 
+cas_hladoveni = dt.datetime.now()
+cas_starnuti = dt.datetime.now()
+vek_doziti = random.randint(12,15)
+
+
+
 def lek():
-    if surikata["životy"] >= 100:
-        print(f"{surikata["jméno"]} je zdravý a nepotřebuje léky")
+    if surikata['životy'] >= 100:
+        print(f"{surikata['jméno']} je zdravý a nepotřebuje léky")
     else:
-        surikata["životy"] += 25
-    surikata["nemoc"] = False
+        surikata['životy'] += 25
+    surikata['nemoc'] = False
 
 def hra():
-    surikata["hlad"] += 15
-    surikata["žízeň"] += 15
-    surikata["energie"] -= 15
-    surikata["radost"] = True
-    print(f"{surikata["jméno"]} si hrál a má radost")
+    surikata['hlad'] += 15
+    surikata['žízeň'] += 15
+    surikata['energie'] -= 15
+    surikata['radost'] = True
+    print(f"{surikata['jméno']} si hrál a má radost")
 
 def spanek():
-    surikata["energie"] = 100
+    surikata['energie'] = 100
     print(f"Zzz...")
 
 def krmeni():
-    surikata["hlad"] -= 20
-    print(f"{surikata["jméno"]} se napapal")
-    print(f"Hlad je {surikata["hlad"]}")
+    surikata['hlad'] -= 20
+    print(f"{surikata['jméno']} se napapal")
+    print(f"Hlad je {surikata['hlad']}")
 
 def zkontroluj_status():
-    if surikata["hlad"] > 100 or surikata["hlad"] < 0:
-        surikata["životy"] -= 10
-    if surikata["žízeň"] > 100 or surikata["žízeň"] < 0: 
-        surikata["životy"] -= 10
-    if surikata["energie"] < 0:
-        print(f"{surikata["jméno"]} chce spát!!!!")
-    if surikata["energie"] > 100:
-        print(f"{surikata["jméno"]} má ADHD")
-    if surikata["radost"] == False:
-        print(f"{surikata["jméno"]} je smutná")
-        surikata["životy"] -= 5
-    if surikata["čistota"] < 25:
-        surikata["radost"] = False
-        surikata["nemoc"] = True
-    if surikata["nemoc"] == True:
-        print(f"{surikata["jméno"]} je smutný")
-        surikata["životy"] -= 10
+    if surikata['hlad'] > 100 or surikata['hlad'] < 0:
+        surikata['životy'] -= 10
+    if surikata['žízeň'] > 100 or surikata['žízeň'] < 0: 
+        surikata['životy'] -= 10
+    if surikata['energie'] < 0:
+        print(f"{surikata['jméno']} chce spát!!!!")
+    if surikata['energie'] > 100:
+        print(f"{surikata['jméno']} má ADHD")
+    if surikata['radost'] == False:
+        print(f"{surikata['jméno']} je smutná")
+        surikata['životy'] -= 5
+    if surikata['čistota'] < 25:
+        surikata['radost'] = False
+        surikata['nemoc'] = True
+    if surikata['nemoc'] == True:
+        print(f"{surikata['jméno']} je smutný")
+        surikata['životy'] -= 10
+    if surikata['věk'] >= vek_doziti:
+        surikata['žije'] = False
+    if surikata['životy'] < 0:
+        surikata['žije'] = False
 
-    if surikata["životy"] < 0:
-        surikata["žije"] = False
-
-    if surikata["žije"] == False:
-        print(f"{surikata["jméno"]} umřel... :(")
+    if surikata['žije'] == False:
+        print(f"{surikata['jméno']} umřel... :(")
+        game_reset()
         sys.exit()
 
 def vypis_status():
-    print(f"""{surikata["jméno"]}:
-        hlad: {surikata["hlad"]}
-        žízeň: {surikata["žízeň"]}
-        energie: {surikata["energie"]}
-        životy: {surikata["životy"]}
-        má radost: {surikata["radost"]}
+    print(f"""{surikata['jméno']}:
+        hlad: {surikata['hlad']}
+        žízeň: {surikata['žízeň']}
+        energie: {surikata['energie']}
+        životy: {surikata['životy']}
+        má radost: {surikata['radost']}
     """)  
 
 
@@ -97,9 +107,40 @@ def load_game():
         surikata = default_surikata
         save_game()
 
+def hladoveni():
+
+    global cas_hladoveni
+
+    ted = dt.datetime.now()
+
+
+    if ted > cas_hladoveni + dt.timedelta(minutes=5):
+        surikata['hlad'] += 10
+        print(f"{surikata['jméno']} začíná mít hlad...")
+        cas_hladoveni = ted
+
+
+def startnuti():
+
+    global cas_starnuti
+
+    ted = dt.datetime.now()
+
+    if ted > cas_starnuti + dt.timedelta(hours=1):
+        surikata['věk'] += 1
+        print(f"{surikata['jméno']} má narozeniny!!! 🎉")
+        cas_starnuti = ted
+
+
+def game_reset():
+    global default_surikata, surikata
+    surikata = default_surikata
+    save_game()
+
 
 
 def main():
+    
     load_game()
 
     print("[green bold]Vítej![/green bold]")
@@ -143,12 +184,16 @@ def main():
                 save_game()
             case "l":
                 lek()
+            case "reset":
+                game_reset()
             case _:
                 print("[bold red]Neplatná klávesa[/bold red]")
 
 
         
         zkontroluj_status()
+        hladoveni()
+        startnuti()
         save_game()
 
 

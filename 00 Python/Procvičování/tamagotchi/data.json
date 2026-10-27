@@ -7,5 +7,6 @@
     "energie": 100,
     "žije": true,
     "nemoc": false,
-    "radost": true
+    "radost": true,
+    "věk": 1
 }
